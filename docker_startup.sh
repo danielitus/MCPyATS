@@ -95,6 +95,10 @@ echo "Building nist-mcp image..."
 docker build -t nist-mcp ./nist
 echo "nist-mcp image built successfully"
 
+echo "Building a2a-adapter image..."
+docker build -t a2a-adapter ./a2a
+echo "a2a-adapter image built successfully"
+
 echo "Building streamlit-app image..."
 docker build -t streamlit-app ./streamlit
 if [ $? -ne 0 ]; then echo "Error building streamlit-app image."; exit 1; fi
@@ -133,7 +137,7 @@ echo "excalidraw-mcp container started."
 
 docker run -dit \
   --name filesystem-mcp \
-  -v "/home/johncapobianco/pyATS_MCP:/projects" \
+  -v "/home/johncapobianco/MCPyATS/shared_output:/projects" \
   filesystem-mcp
 
 echo "Starting netbox-mcp container..."
@@ -173,13 +177,13 @@ echo "quickchart-mcp container started."
 
 echo "Starting vegalite-mcp container..."
 docker run -dit --name vegalite-mcp \
-  -v "/home/johncapobianco/MCPyATS:/output" \
+  -v "/home/johncapobianco/MCPyATS/shared_output:/output" \
   vegalite-mcp
 echo "vegalite-mcp container started."
 
 echo "Starting mermaid-mcp container..."
 docker run -dit --name mermaid-mcp \
-  -v "/home/johncapobianco/MCPyATS:/output" \
+  -v "/home/johncapobianco/MCPyATS/shared_output:/output" \
   -e CONTENT_IMAGE_SUPPORTED=false \
   mermaid-mcp
 echo "mermaid-mcp container started."
@@ -204,15 +208,35 @@ fi
 
 sleep 2
 
+echo "Starting a2a-adapter container..."
+docker run -p 10000:10000 \
+    -dit \
+    --name a2a-adapter \
+    -v $(pwd)/a2a:/a2a \
+    --env-file .env \
+    -e LANGGRAPH_URL=http://host.docker.internal:2024 \
+    -e PUBLIC_BASE_URL=https://ee30-70-53-207-50.ngrok-free.app/ \
+    -v /home/johncapobianco/MCPyATS/shared_output:/output \
+    -e A2A_PORT=10000 \
+    a2a-adapter
+echo "a2a-adapter container started."
+
+
+sleep 5
+
 echo "Starting mcpyats container..."
 docker run -p 2024:2024 -dit \
-    -v /var/run/docker.sock:/var/run/docker.sock \
     --name mcpyats \
+    --env-file .env \
+    -v /var/run/docker.sock:/var/run/docker.sock \
+    -v $(pwd)/a2a:/a2a \
+    -v /home/johncapobianco/MCPyATS/shared_output:/output \
     mcpyats
 echo "mcpyats container started."
 
 echo "Starting streamlit-app container..."
 docker run -d --name streamlit-app -p 8501:8501 streamlit-app
 echo "streamlit-app container started at http://localhost:8501"
+
 
 echo "All containers started."
