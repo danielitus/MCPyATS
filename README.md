@@ -5,6 +5,133 @@ MCPyATS brings together the Model Context Protocol (MCP) and Cisco pyATS to buil
 
 It includes multiple tool-integrated MCP servers, a LangGraph agent backend, a Streamlit UI frontend, and support for A2A (Agent-to-Agent) communication.
 
+## 🎯 How to Use MCP Servers in Your Environment
+
+### Quick Start Guide
+
+1. **Initial Setup**
+```bash
+# Clone the repository
+git clone https://github.com/danielitus/MCPyATS
+cd MCPyATS
+
+# Configure environment variables
+cp .env.example .env
+# Edit .env with your API keys and credentials
+
+# Launch all services
+./docker_startup.sh
+```
+
+2. **Access Points**
+- **Web UI**: http://localhost:8501 (Streamlit interface)
+- **LangGraph API**: http://localhost:2024
+- **Draw.io**: http://localhost:8080
+- **A2A Adapter**: http://localhost:10000
+
+3. **Usage Methods**
+
+**Via Web Interface (Recommended)**:
+- Navigate to http://localhost:8501
+- Enter natural language commands:
+  - "Show BGP status on router R1"
+  - "Create a network diagram with 3 routers"
+  - "Send alert to Slack channel #network-ops"
+  - "Calculate subnet for 192.168.1.0/24"
+  - "Check CVE-2023-12345 details"
+  - "Send email report to team@company.com"
+
+**Via API (Programmatic)**:
+```python
+# Example using the A2A client
+from a2a.agent.client import Client
+client = Client("http://localhost:10000")
+response = client.query("Show interface status on all devices")
+```
+
+**Direct MCP Integration**:
+- Each server exposes MCP protocol on STDIO or HTTP
+- Compatible with MCP clients like Claude Desktop, Continue.dev
+- Can be integrated into custom applications
+
+4. **Available MCP Servers**
+
+**Network Infrastructure**:
+- `pyats_mcp_server`: Network device automation via Cisco pyATS
+- `aci_mcp`: Cisco ACI fabric management
+- `ise_mcp`: Cisco ISE security policy management
+- `subnet_calculator`: IP subnet calculations
+- `netbox`: IPAM/DCIM integration
+
+**Visualization & Diagramming**:
+- `drawio_mcp`: Interactive diagram creation
+- `mermaid`: Text-to-diagram conversion
+- `excalidraw`: Whiteboard-style drawings
+- `vegalite`: Data visualizations
+- `quickchart`: Quick chart generation
+
+**Communication & Collaboration**:
+- `slack`: Slack messaging automation
+- `email`: SMTP email sending
+- `servicenow`: IT service management
+
+**Development & Documentation**:
+- `github`: GitHub repository management
+- `filesystem`: File operations
+- `rfc`: IETF RFC document access
+
+**Information & Intelligence**:
+- `wikipedia`: Knowledge retrieval
+- `nist`: CVE vulnerability database
+- `google_search`: Web search automation
+- `google_maps`: Location services
+
+**AI & Reasoning**:
+- `chatgpt`: External AI reasoning with GPT-4
+- `sequentialthinking`: Structured problem-solving
+
+5. **Configuration Requirements**
+
+Essential environment variables in `.env`:
+```env
+# LLM (choose one)
+OPENAI_API_KEY=your_openai_key
+GOOGLE_API_KEY=your_google_key
+
+# Network automation
+PYATS_TESTBED_PATH=./mcp_servers/pyats_mcp_server/testbed.yaml
+
+# Service-specific tokens (as needed)
+GITHUB_TOKEN=your_github_token
+SLACK_BOT_TOKEN=your_slack_token
+NETBOX_TOKEN=your_netbox_token
+# ... etc
+```
+
+6. **Example Commands**
+
+```bash
+# Network Operations
+"Show running config on R1"
+"Configure VLAN 100 on switch SW1"
+"Ping 8.8.8.8 from router R2"
+
+# Visualization
+"Create network topology diagram for campus network"
+"Generate pie chart of interface utilization"
+
+# Communication
+"Send 'Network maintenance tonight' to Slack #ops"
+"Email network report to admin@company.com"
+
+# Information Gathering
+"Search for BGP best practices RFC"
+"Check vulnerability CVE-2024-12345"
+"Find location of IP 8.8.8.8"
+```
+
+The system uses AI to understand your intent and automatically orchestrates the appropriate MCP servers to complete your request.
+
 ## 🌐 What is MCP?
 The Model Context Protocol (MCP) from Anthropic is a protocol that offers USB-C like interoperability between MCP Servers, where tools are exposed, and MCP Clients, where the agent is running. It allows for a standardized way to communicate between different agents and tools, enabling them to work together seamlessly.
 
